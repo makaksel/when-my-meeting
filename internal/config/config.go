@@ -16,32 +16,15 @@ func New(path string) (*Service, error) {
 		Path: path,
 	}
 
-	if _, err := s.Init(path); err != nil {
-		return nil, err
-	}
-
-	return s, nil
-}
-
-func (s *Service) Init(path string) (*Service, error) {
 	// Если конфиг есть, закгружаем, если нет, создаем базовый
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		defaultConfig := &domain.Config{
-			RefreshInterval: 10,
-			Notifications: domain.Notify{
-				Before: 5,
-				Active: true,
-			},
-		}
 
-		if err := s.Save(defaultConfig); err != nil {
+		if err := s.Save(domain.DefaultConfig); err != nil {
 			return nil, err
 		}
 	}
 
-	return &Service{
-		Path: path,
-	}, nil
+	return s, nil
 }
 
 func (c *Service) Get() (*domain.Config, error) {
