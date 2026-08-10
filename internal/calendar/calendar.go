@@ -2,12 +2,18 @@ package calendar
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"makaksel/when-my-meeting/internal/config"
+	"makaksel/when-my-meeting/internal/domain"
 	"makaksel/when-my-meeting/internal/state"
 	"makaksel/when-my-meeting/internal/storage"
 	"makaksel/when-my-meeting/internal/tray"
+	"makaksel/when-my-meeting/internal/utils"
 	"os"
+	"slices"
+	"strings"
+	"time"
 
 	"github.com/apognu/gocal"
 )
@@ -39,20 +45,14 @@ func (s *Service) Sync(ctx context.Context) error {
 		return err
 	}
 
-	for _, calendar := range cfg.Calendars {
+	meetings := s.parseCalendars(cfg.Calendars, cfg.TemporaryFilesPath)
 
-		if !calendar.Enabled {
-			continue
-		}
-
-		filePath := cfg.TemporaryFilesPath + calendar.ID + ".ics"
-		_, err := s.ParseICV(ctx, filePath)
-		if err != nil {
-			log.Printf("read calendar %s: %v", calendar.ID, err)
-			continue
-		}
-
+	if len(meetings) != 0 {
+		nextMeeting := meetings[0]
+		log.Printf("nextMeeting %+v", nextMeeting.Start.Local())
 	}
+
+	// log.Printf("parsed %+v meetings from all calendars", meetings)
 
 	// берем календари из конфига
 	// проверяем скачанные, удаляем те что нет
@@ -65,18 +65,66 @@ func (s *Service) Sync(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) ParseICV(ctx context.Context, path string) (string, error) {
+func (s *Service) parseCalendars(calendars []domain.Calendar, filesPath string) []domain.Meeting {
+	meetings := make([]domain.Meeting, 0, 25)
+
+	for _, calendar := range calendars {
+
+		if !calendar.Enabled {
+			continue
+		}
+
+		newMeetings, err := s.parseICS(filesPath+calendar.ID+".ics", calendar.ID, calendar.Name)
+		if err != nil {
+			log.Printf("read calendar %s: %v", calendar.ID, err)
+			continue
+		}
+
+		meetings = append(meetings, newMeetings...)
+	}
+
+	slices.SortFunc(meetings, func(a, b domain.Meeting) int {
+		return a.Start.Local().Compare(b.Start.Local())
+	})
+
+	return meetings
+}
+
+func (s *Service) parseICS(path string, calendarID, calendar string) ([]domain.Meeting, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer f.Close()
 
+	gocal.SetTZMapper(func(tzid string) (*time.Location, error) {
+		cleanTZID := strings.TrimSpace(tzid)
+		cleanTZID = strings.Trim(cleanTZID, `"'`)
+
+		loc, err := time.LoadLocation(cleanTZID)
+
+		if err != nil {
+			return nil, fmt.Errorf("unknown timezone: %s", err)
+		}
+
+		return loc, nil
+	})
+
+	meetings := make([]domain.Meeting, 0, 20)
 	c := gocal.NewParser(f)
 	c.Parse()
+
 	for _, e := range c.Events {
-		log.Printf("%s at %s in %s", e.Summary, e.Start, e.Location)
+		if utils.IsToday(e.Start) {
+			meetings = append(meetings, domain.Meeting{
+				CalendarID: calendarID,
+				Calendar:   calendar,
+				Title:      e.Summary,
+				Start:      e.Start,
+				Location:   e.Location,
+			})
+		}
 	}
 
-	return "", nil
+	return meetings, nil
 }
