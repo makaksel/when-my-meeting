@@ -34,9 +34,9 @@ func New() (*App, error) {
 
 	tr := tray.New(cfg, s)
 
-	n := notification.New(cfg)
+	n := notification.New(cfg, s)
 
-	c := calendar.New(cfg, strg, s, tr)
+	c := calendar.New(cfg, s, strg, tr)
 
 	return &App{
 		config:       cfg,
@@ -45,21 +45,21 @@ func New() (*App, error) {
 		calendar:     c,
 		notification: n,
 		tray:         tr,
-		scheduler:    scheduler.New(cfg, c, n),
+		scheduler:    scheduler.New(cfg, s, c, n, tr),
 	}, nil
 }
 
 func (a *App) Run(ctx context.Context) error {
-	a.calendar.Sync(ctx)
+	a.calendar.SyncLocalOnly(ctx)
+	a.calendar.SyncRemote(ctx)
 
-	a.scheduler.SyncCalendar(ctx)
-	a.scheduler.CheckNotifications(ctx)
+	a.notification.Check()
 
-	// Обработка кнопок
-	// событие -> на локешн если он есть
-	// рефреш, немедленно перезапускает цикл
-	// общая форма для настроек и редактирования календарей
-	// выход
+	a.tray.Refresh(ctx)
+
+	a.scheduler.Start(ctx)
+
+	<-ctx.Done()
 
 	return nil
 }
