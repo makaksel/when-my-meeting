@@ -22,7 +22,6 @@ type Notify struct {
 }
 
 type Calendar struct {
-	ID       string `yaml:"id"`
 	Name     string `yaml:"name"`
 	URL      string `yaml:"url"`
 	Enabled  bool   `yaml:"enabled"`
