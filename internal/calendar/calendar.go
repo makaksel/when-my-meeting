@@ -11,7 +11,6 @@ import (
 	"makaksel/when-my-meeting/internal/tray"
 	"makaksel/when-my-meeting/internal/utils"
 	"os"
-	"slices"
 	"strings"
 	"time"
 
@@ -20,15 +19,15 @@ import (
 
 type Service struct {
 	Config  *config.Service
-	Storage *storage.Service
 	State   *state.Service
+	Storage *storage.Service
 	Tray    *tray.Service
 }
 
 func New(
 	cfg *config.Service,
-	strg *storage.Service,
 	s *state.Service,
+	strg *storage.Service,
 	t *tray.Service,
 ) *Service {
 	return &Service{
@@ -39,53 +38,41 @@ func New(
 	}
 }
 
-func (s *Service) Sync(ctx context.Context) error {
+func (s *Service) SyncLocalOnly(ctx context.Context) error {
 	cfg, err := s.Config.Get()
 	if err != nil {
 		return err
 	}
 
-	meetings := s.parseCalendars(cfg.Calendars, cfg.TemporaryFilesPath)
-
-	if len(meetings) != 0 {
-		nextMeeting := meetings[0]
-		log.Printf("nextMeeting %+v", nextMeeting.Start.Local())
-	}
-
-	// log.Printf("parsed %+v meetings from all calendars", meetings)
-
-	// берем календари из конфига
-	// проверяем скачанные, удаляем те что нет
-	// парсим те что остались
-	// обновляем стейт
-
-	// отправляем загружаться те что есть в конфиге из ремута
-	// после загрузки обновляем стейт
+	newMeetings := s.parseCalendars(s.onlyEnabled(cfg.Calendars), cfg.TemporaryFilesPath)
+	s.State.UpdateMeetings(newMeetings)
 
 	return nil
+}
+
+func (s *Service) SyncRemote(ctx context.Context) error {
+	cfg, err := s.Config.Get()
+	if err != nil {
+		return err
+	}
+
+	s.loadCalendars(s.onlyEnabled(cfg.Calendars))
+
+	return s.SyncLocalOnly(ctx)
 }
 
 func (s *Service) parseCalendars(calendars []domain.Calendar, filesPath string) []domain.Meeting {
 	meetings := make([]domain.Meeting, 0, 25)
 
 	for _, calendar := range calendars {
-
-		if !calendar.Enabled {
-			continue
-		}
-
-		newMeetings, err := s.parseICS(filesPath+calendar.ID+".ics", calendar.ID, calendar.Name)
+		newMeetings, err := s.parseICS(filesPath+calendar.Name+".ics", calendar.Name, calendar.Name)
 		if err != nil {
-			log.Printf("read calendar %s: %v", calendar.ID, err)
+			log.Printf("read calendar %s: %v", calendar.Name, err)
 			continue
 		}
 
 		meetings = append(meetings, newMeetings...)
 	}
-
-	slices.SortFunc(meetings, func(a, b domain.Meeting) int {
-		return a.Start.Local().Compare(b.Start.Local())
-	})
 
 	return meetings
 }
@@ -127,4 +114,25 @@ func (s *Service) parseICS(path string, calendarID, calendar string) ([]domain.M
 	}
 
 	return meetings, nil
+}
+
+func (s *Service) loadCalendars(calendars []domain.Calendar) {
+	for _, calendar := range calendars {
+		err := s.Storage.LoadCalendar(calendar.URL, calendar.Name, calendar.User, calendar.Password)
+		if err != nil {
+			log.Printf("load calendar %s: %v", calendar.Name, err)
+			continue
+		}
+	}
+}
+
+func (s *Service) onlyEnabled(calendars []domain.Calendar) []domain.Calendar {
+	filtered := make([]domain.Calendar, 0, len(calendars))
+	for _, calendar := range calendars {
+		if calendar.Enabled {
+			filtered = append(filtered, calendar)
+		}
+	}
+
+	return filtered
 }
