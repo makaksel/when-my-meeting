@@ -8,7 +8,6 @@ import (
 	"makaksel/when-my-meeting/internal/config"
 	"makaksel/when-my-meeting/internal/notification"
 	"makaksel/when-my-meeting/internal/state"
-	"makaksel/when-my-meeting/internal/tray"
 	"time"
 )
 
@@ -17,7 +16,6 @@ type Service struct {
 	State        *state.Service
 	Calendar     *calendar.Service
 	Notification *notification.Service
-	Tray         *tray.Service
 }
 
 func New(
@@ -25,9 +23,13 @@ func New(
 	s *state.Service,
 	c *calendar.Service,
 	n *notification.Service,
-	t *tray.Service,
 ) *Service {
-	return &Service{Config: cfg, State: s, Calendar: c, Notification: n, Tray: t}
+	return &Service{
+		Config:       cfg,
+		State:        s,
+		Calendar:     c,
+		Notification: n,
+	}
 }
 
 func (s *Service) Start(ctx context.Context) {
@@ -48,12 +50,6 @@ func (s *Service) Start(ctx context.Context) {
 	go s.worker(ctx, time.Minute, "checkNotifications", func() {
 		s.Notification.Check()
 	})
-
-	// Воркер для обновления трея
-	go s.worker(ctx, time.Second*30, "refreshTray", func() {
-		s.Tray.Refresh(ctx)
-	})
-
 }
 
 func (s *Service) worker(ctx context.Context, dur time.Duration, name string, task func()) {
