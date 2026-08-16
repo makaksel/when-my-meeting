@@ -22,7 +22,7 @@ type App struct {
 	scheduler    *scheduler.Service
 }
 
-func New() (*App, error) {
+func New(cancel context.CancelFunc) (*App, error) {
 	cfg, err := config.New("config.yaml")
 	if err != nil {
 		return nil, fmt.Errorf("config is not initialized: %s", err)
@@ -32,20 +32,22 @@ func New() (*App, error) {
 
 	strg := storage.New(cfg)
 
-	tr := tray.New(cfg, s)
-
 	n := notification.New(cfg, s)
 
-	c := calendar.New(cfg, s, strg, tr)
+	c := calendar.New(cfg, s, strg)
+
+	tr := tray.New(cfg, s, cancel)
+
+	sch := scheduler.New(cfg, s, c, n)
 
 	return &App{
 		config:       cfg,
-		state:        s,
 		storage:      strg,
 		calendar:     c,
 		notification: n,
 		tray:         tr,
-		scheduler:    scheduler.New(cfg, s, c, n, tr),
+		state:        s,
+		scheduler:    sch,
 	}, nil
 }
 
@@ -55,7 +57,7 @@ func (a *App) Run(ctx context.Context) error {
 
 	a.notification.Check()
 
-	a.tray.Refresh(ctx)
+	go a.tray.Run(ctx)
 
 	a.scheduler.Start(ctx)
 
