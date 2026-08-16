@@ -19,7 +19,7 @@ func main() {
 	)
 	defer cancel()
 
-	a, err := app.New()
+	a, err := app.New(cancel)
 	if err != nil {
 		log.Fatalf("app init: %v", err)
 	}
