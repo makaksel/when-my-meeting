@@ -8,7 +8,6 @@ import (
 	"makaksel/when-my-meeting/internal/domain"
 	"makaksel/when-my-meeting/internal/state"
 	"makaksel/when-my-meeting/internal/storage"
-	"makaksel/when-my-meeting/internal/tray"
 	"makaksel/when-my-meeting/internal/utils"
 	"os"
 	"strings"
@@ -21,20 +20,17 @@ type Service struct {
 	Config  *config.Service
 	State   *state.Service
 	Storage *storage.Service
-	Tray    *tray.Service
 }
 
 func New(
 	cfg *config.Service,
 	s *state.Service,
 	strg *storage.Service,
-	t *tray.Service,
 ) *Service {
 	return &Service{
 		Config:  cfg,
 		Storage: strg,
 		State:   s,
-		Tray:    t,
 	}
 }
 
