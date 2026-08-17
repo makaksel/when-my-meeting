@@ -36,7 +36,7 @@ func New(cancel context.CancelFunc) (*App, error) {
 
 	c := calendar.New(cfg, s, strg)
 
-	tr := tray.New(cfg, s, cancel)
+	tr := tray.New(cfg, s, cancel, c.SyncRemote)
 
 	sch := scheduler.New(cfg, s, c, n)
 
@@ -52,16 +52,14 @@ func New(cancel context.CancelFunc) (*App, error) {
 }
 
 func (a *App) Run(ctx context.Context) error {
-	a.calendar.SyncLocalOnly(ctx)
-	a.calendar.SyncRemote(ctx)
+	a.calendar.SyncLocalOnly()
+	a.calendar.SyncRemote()
 
 	a.notification.Check()
 
-	go a.tray.Run(ctx)
+	go a.scheduler.Start(ctx)
 
-	a.scheduler.Start(ctx)
-
-	<-ctx.Done()
+	a.tray.Run(ctx)
 
 	return nil
 }
