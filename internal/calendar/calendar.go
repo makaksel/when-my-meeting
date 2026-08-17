@@ -1,7 +1,6 @@
 package calendar
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"makaksel/when-my-meeting/internal/config"
@@ -34,7 +33,7 @@ func New(
 	}
 }
 
-func (s *Service) SyncLocalOnly(ctx context.Context) error {
+func (s *Service) SyncLocalOnly() error {
 	cfg, err := s.Config.Get()
 	if err != nil {
 		return err
@@ -46,7 +45,7 @@ func (s *Service) SyncLocalOnly(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) SyncRemote(ctx context.Context) error {
+func (s *Service) SyncRemote() error {
 	cfg, err := s.Config.Get()
 	if err != nil {
 		return err
@@ -54,7 +53,7 @@ func (s *Service) SyncRemote(ctx context.Context) error {
 
 	s.loadCalendars(s.onlyEnabled(cfg.Calendars))
 
-	return s.SyncLocalOnly(ctx)
+	return s.SyncLocalOnly()
 }
 
 func (s *Service) parseCalendars(calendars []domain.Calendar, filesPath string) []domain.Meeting {
