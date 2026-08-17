@@ -99,11 +99,13 @@ func (s *Service) parseICS(path string, calendarID, calendar string) ([]domain.M
 	for _, e := range c.Events {
 		if utils.IsToday(e.Start) {
 			meetings = append(meetings, domain.Meeting{
-				CalendarID: calendarID,
-				Calendar:   calendar,
-				Title:      e.Summary,
-				Start:      e.Start,
-				Location:   e.Location,
+				CalendarID:  calendarID,
+				Calendar:    calendar,
+				Title:       e.Summary,
+				Description: e.Description,
+				Start:       e.Start,
+				End:         e.End,
+				Location:    e.Location,
 			})
 		}
 	}
