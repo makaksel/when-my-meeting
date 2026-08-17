@@ -42,7 +42,7 @@ func (s *Service) Start(ctx context.Context) {
 	// Воркер для синхронизации календарей
 	if cfg.RefreshInterval != 0 {
 		go s.worker(ctx, time.Duration(cfg.RefreshInterval)*time.Minute, "syncCalendars", func() {
-			s.Calendar.SyncRemote(ctx)
+			s.Calendar.SyncRemote()
 		})
 	}
 
