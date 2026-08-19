@@ -22,7 +22,7 @@ func (s *Service) GetFolowingMeetings() []domain.Meeting {
 	folowing := make([]domain.Meeting, 0, len(meetings))
 
 	for i := range meetings {
-		if utils.IsFolowing(meetings[i].Start) && utils.IsFolowing(meetings[i].End) {
+		if utils.IsFolowing(meetings[i].End) {
 			folowing = append(folowing, meetings[i])
 		}
 	}
