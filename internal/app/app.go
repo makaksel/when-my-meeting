@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"makaksel/when-my-meeting/internal/calendar"
 	"makaksel/when-my-meeting/internal/config"
+	"makaksel/when-my-meeting/internal/gui"
+	"makaksel/when-my-meeting/internal/gui/tray"
 	"makaksel/when-my-meeting/internal/notification"
 	"makaksel/when-my-meeting/internal/scheduler"
 	"makaksel/when-my-meeting/internal/state"
 	"makaksel/when-my-meeting/internal/storage"
-	"makaksel/when-my-meeting/internal/tray"
 )
 
 type App struct {
@@ -20,6 +21,7 @@ type App struct {
 	notification *notification.Service
 	tray         *tray.Service
 	scheduler    *scheduler.Service
+	gui          *gui.Service
 }
 
 func New(cancel context.CancelFunc) (*App, error) {
@@ -36,18 +38,18 @@ func New(cancel context.CancelFunc) (*App, error) {
 
 	c := calendar.New(cfg, s, strg)
 
-	tr := tray.New(cfg, s, cancel, c.SyncRemote)
-
 	sch := scheduler.New(cfg, s, c, n)
+
+	gui := gui.New(cfg, s, cancel, c.SyncRemote)
 
 	return &App{
 		config:       cfg,
 		storage:      strg,
 		calendar:     c,
 		notification: n,
-		tray:         tr,
 		state:        s,
 		scheduler:    sch,
+		gui:          gui,
 	}, nil
 }
 
@@ -59,7 +61,7 @@ func (a *App) Run(ctx context.Context) error {
 
 	go a.scheduler.Start(ctx)
 
-	a.tray.Run(ctx)
+	a.gui.Run(ctx)
 
 	return nil
 }
