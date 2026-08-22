@@ -40,7 +40,7 @@ func New(cancel context.CancelFunc) (*App, error) {
 
 	sch := scheduler.New(cfg, s, c, n)
 
-	gui := gui.New(cfg, s, cancel, c.SyncRemote)
+	gui := gui.New(cfg, s, cancel, c.SyncRemote, strg.DeleteCalendar)
 
 	return &App{
 		config:       cfg,
