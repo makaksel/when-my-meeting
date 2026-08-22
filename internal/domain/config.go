@@ -27,4 +27,6 @@ type Calendar struct {
 	Enabled  bool   `yaml:"enabled"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
+	LastSync int64  `yaml:"last_sync"`
+	Error    string `yaml:"error"`
 }
