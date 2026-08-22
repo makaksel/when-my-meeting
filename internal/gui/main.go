@@ -23,9 +23,10 @@ func New(
 	state *state.Service,
 	cancel context.CancelFunc,
 	handleSync func() error,
+	deleteCalendar func(string),
 ) *Service {
 	a := app.NewWithID("com.makaksel.when-my-meeting")
-	st := settings.New(cfg, a)
+	st := settings.New(cfg, a, handleSync, deleteCalendar)
 
 	tr := tray.New(
 		cfg,

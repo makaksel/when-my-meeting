@@ -17,7 +17,7 @@ func New(config *config.Service) *Service {
 	return &Service{Config: config}
 }
 
-func (s *Service) LoadCalendar(fileUrl, fileName, username, password string) error {
+func (s *Service) LoadCalendar(url, fileName, username, password string) error {
 	cfg, err := s.Config.Get()
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func (s *Service) LoadCalendar(fileUrl, fileName, username, password string) err
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	req, err := http.NewRequest("GET", fileUrl, nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
@@ -47,7 +47,7 @@ func (s *Service) LoadCalendar(fileUrl, fileName, username, password string) err
 		return fmt.Errorf("bad HTTP status: %s", resp.Status)
 	}
 
-	filePath := filepath.Join(cfg.TemporaryFilesPath, fileName+".ics")
+	filePath := s.makeFilePath(fileName)
 	fmt.Printf("Saving file as: %s\n", filePath)
 
 	out, err := os.Create(filePath)
@@ -64,10 +64,21 @@ func (s *Service) LoadCalendar(fileUrl, fileName, username, password string) err
 	return nil
 }
 
-func (s *Service) DeleteCalendar(id string) {
+func (s *Service) DeleteCalendar(name string) {
 
+	err := os.Remove(s.makeFilePath(name))
+	if err != nil {
+		fmt.Println("Ошибка удаления файла:", err)
+		return
+	}
+
+	fmt.Println("Файл успешно удален")
 }
 
-func (s *Service) ListCalendars() {
-
+func (s *Service) makeFilePath(name string) string {
+	cfg, err := s.Config.Get()
+	if err != nil {
+		return ""
+	}
+	return filepath.Join(cfg.TemporaryFilesPath, name+".ics")
 }

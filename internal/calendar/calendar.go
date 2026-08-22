@@ -53,6 +53,8 @@ func (s *Service) SyncRemote() error {
 
 	s.loadCalendars(s.onlyEnabled(cfg.Calendars))
 
+	s.Config.Save(cfg)
+
 	return s.SyncLocalOnly()
 }
 
@@ -114,13 +116,17 @@ func (s *Service) parseICS(path string, calendarID, calendar string) ([]domain.M
 }
 
 func (s *Service) loadCalendars(calendars []domain.Calendar) {
-	for _, calendar := range calendars {
+	for i, calendar := range calendars {
 		err := s.Storage.LoadCalendar(calendar.URL, calendar.Name, calendar.User, calendar.Password)
 		if err != nil {
 			log.Printf("load calendar %s: %v", calendar.Name, err)
+			calendars[i].Error = fmt.Sprintf("load calendar %s: %v", calendar.Name, err)
 			continue
 		}
+		calendars[i].Error = ""
+		calendars[i].LastSync = time.Now().Unix()
 	}
+
 }
 
 func (s *Service) onlyEnabled(calendars []domain.Calendar) []domain.Calendar {
