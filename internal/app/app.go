@@ -54,6 +54,8 @@ func New(cancel context.CancelFunc) (*App, error) {
 }
 
 func (a *App) Run(ctx context.Context) error {
+	a.storage.Init()
+
 	a.calendar.SyncLocalOnly()
 	a.calendar.SyncRemote()
 
