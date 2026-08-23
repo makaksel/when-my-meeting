@@ -11,6 +11,8 @@ import (
 	_ "time/tzdata"
 )
 
+var version = "dev"
+
 func main() {
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
