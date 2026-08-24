@@ -1,2 +1,9 @@
+[Details]
+Name = "When My Meeting"
+ID = "com.makaksel.when-my-meeting"
+Version = "0.1.0"
+Build = 1
+
+
 [Migrations]
 fyneDo = true
