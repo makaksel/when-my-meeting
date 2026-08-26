@@ -83,7 +83,7 @@ func (s *Service) sendNotification(m *domain.Meeting) {
 	title := fmt.Sprintf("%s-%s %s", m.Start.Local().Format("15:04"), m.End.Local().Format("15:04"), m.Title)
 	location := fmt.Sprintf("Место провердения: %s\n\n", m.Location)
 
-	err := beeep.Notify(title, location+m.Description, assets.Icon)
+	err := beeep.Notify(title, "\n"+location+m.Description, assets.Icon)
 	if err != nil {
 		log.Printf("send Notification err: %v", err)
 	}
