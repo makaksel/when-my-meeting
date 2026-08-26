@@ -8,6 +8,7 @@ import (
 	"makaksel/when-my-meeting/internal/gui"
 	"makaksel/when-my-meeting/internal/gui/tray"
 	"makaksel/when-my-meeting/internal/notification"
+	"makaksel/when-my-meeting/internal/paths"
 	"makaksel/when-my-meeting/internal/scheduler"
 	"makaksel/when-my-meeting/internal/state"
 	"makaksel/when-my-meeting/internal/storage"
@@ -25,29 +26,32 @@ type App struct {
 }
 
 func New(cancel context.CancelFunc) (*App, error) {
-	cfg, err := config.New("config.yaml")
+	p, err := paths.New("when-my-meeting")
+	if err != nil {
+		return nil, fmt.Errorf("paths is not initialized: %s", err)
+	}
+
+	cfg, err := config.New(p)
 	if err != nil {
 		return nil, fmt.Errorf("config is not initialized: %s", err)
 	}
 
 	s := state.New()
 
-	strg := storage.New(cfg)
+	strg := storage.New(cfg, p)
 
 	n := notification.New(cfg, s)
 
-	c := calendar.New(cfg, s, strg)
+	c := calendar.New(cfg, s, strg, p)
 
 	sch := scheduler.New(cfg, s, c, n)
 
 	gui := gui.New(cfg, s, cancel, c.SyncRemote, strg.DeleteCalendar)
 
 	return &App{
-		config:       cfg,
 		storage:      strg,
 		calendar:     c,
 		notification: n,
-		state:        s,
 		scheduler:    sch,
 		gui:          gui,
 	}, nil
