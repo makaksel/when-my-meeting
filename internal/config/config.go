@@ -1,23 +1,30 @@
 package config
 
 import (
+	"fmt"
 	"makaksel/when-my-meeting/internal/domain"
+	"makaksel/when-my-meeting/internal/paths"
 	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
 type Service struct {
-	Path string
+	Paths *paths.Paths
 }
 
-func New(path string) (*Service, error) {
+func New(p *paths.Paths) (*Service, error) {
 	s := &Service{
-		Path: path,
+		Paths: p,
+	}
+
+	err := os.MkdirAll(s.Paths.ConfigDir, 0755)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create directory: %w", err)
 	}
 
 	// Если конфиг есть, закгружаем, если нет, создаем базовый
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	if _, err := os.Stat(s.Paths.ConfigPath); os.IsNotExist(err) {
 
 		if err := s.Save(domain.DefaultConfig); err != nil {
 			return nil, err
@@ -27,8 +34,8 @@ func New(path string) (*Service, error) {
 	return s, nil
 }
 
-func (c *Service) Get() (*domain.Config, error) {
-	data, err := os.ReadFile(c.Path)
+func (s *Service) Get() (*domain.Config, error) {
+	data, err := os.ReadFile(s.Paths.ConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -41,11 +48,11 @@ func (c *Service) Get() (*domain.Config, error) {
 	return &cfg, nil
 }
 
-func (c *Service) Save(cfg *domain.Config) error {
+func (s *Service) Save(cfg *domain.Config) error {
 	data, err := yaml.Marshal(cfg)
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(c.Path, data, 0644)
+	return os.WriteFile(s.Paths.ConfigPath, data, 0644)
 }
