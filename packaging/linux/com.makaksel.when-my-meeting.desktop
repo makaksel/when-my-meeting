@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=When My Meeting
+Comment=Meeting reminder
+Exec=when-my-meeting
+Icon=when-my-meeting
+Terminal=false
+Categories=Utility;
