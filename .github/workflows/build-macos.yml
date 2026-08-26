@@ -22,7 +22,6 @@ jobs:
 
       - name: Build
         run: |
-          mkdir -p dist
           fyne package \
             -os darwin \
             -icon internal/assets/icon.svg \
