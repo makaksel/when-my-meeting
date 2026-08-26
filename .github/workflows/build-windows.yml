@@ -1,0 +1,57 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Build
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+
+          go build `
+            -ldflags="-s -w" `
+            -o dist/when-my-meeting.exe `
+            ./cmd/when-my-meeting
+
+      - name: Prepare package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/package | Out-Null
+
+          Copy-Item `
+            dist/when-my-meeting.exe `
+            dist/package/when-my-meeting.exe
+
+          Copy-Item `
+            packaging/windows/icon.ico `
+            dist/package/icon.ico
+
+      - name: Create ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive `
+            -Path dist/package/* `
+            -DestinationPath dist/when-my-meeting-windows-amd64.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: when-my-meeting-windows-amd64
+          path: dist/when-my-meeting-windows-amd64.zip
