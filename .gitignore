@@ -35,3 +35,5 @@ go.work.sum
 tmp/*
 config.yaml
 fyne-cross
+dist/
+packaging/**/*.icns
