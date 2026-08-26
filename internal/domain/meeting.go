@@ -3,8 +3,7 @@ package domain
 import "time"
 
 type Meeting struct {
-	CalendarID string
-	Calendar   string
+	Calendar string
 
 	Title       string
 	Description string
@@ -12,4 +11,6 @@ type Meeting struct {
 	Start    *time.Time
 	End      *time.Time
 	Location string
+
+	Disabled bool
 }
