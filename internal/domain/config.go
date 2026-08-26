@@ -1,8 +1,7 @@
 package domain
 
 var DefaultConfig = &Config{
-	TemporaryFilesPath: "tmp/",
-	RefreshInterval:    10,
+	RefreshInterval: 10,
 	Notifications: Notify{
 		Before: 5,
 		Active: true,
@@ -10,10 +9,9 @@ var DefaultConfig = &Config{
 }
 
 type Config struct {
-	RefreshInterval    int        `yaml:"refresh_interval"`
-	Notifications      Notify     `yaml:"notifications"`
-	Calendars          []Calendar `yaml:"calendars"`
-	TemporaryFilesPath string     `yaml:"temporary_files_path"`
+	RefreshInterval int        `yaml:"refresh_interval"`
+	Notifications   Notify     `yaml:"notifications"`
+	Calendars       []Calendar `yaml:"calendars"`
 }
 
 type Notify struct {

@@ -3,31 +3,36 @@ package storage
 import (
 	"fmt"
 	"io"
+	"log"
 	"makaksel/when-my-meeting/internal/config"
+	"makaksel/when-my-meeting/internal/domain"
+	"makaksel/when-my-meeting/internal/paths"
 	"net/http"
 	"os"
-	"path/filepath"
+	"slices"
 )
 
 type Service struct {
 	Config *config.Service
+	Paths  *paths.Paths
 }
 
-func New(config *config.Service) *Service {
-	return &Service{Config: config}
+func New(c *config.Service, p *paths.Paths) *Service {
+	return &Service{Config: c, Paths: p}
 }
 
-func (s *Service) LoadCalendar(url, fileName, username, password string) error {
-	cfg, err := s.Config.Get()
-	if err != nil {
-		return err
-	}
-
-	err = os.MkdirAll(cfg.TemporaryFilesPath, 0755)
+func (s *Service) Init() error {
+	err := os.MkdirAll(s.Paths.DataDir, 0755)
 	if err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
+	s.ClearUnused()
+
+	return nil
+}
+
+func (s *Service) LoadCalendar(url, fileName, username, password string) error {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
@@ -47,8 +52,7 @@ func (s *Service) LoadCalendar(url, fileName, username, password string) error {
 		return fmt.Errorf("bad HTTP status: %s", resp.Status)
 	}
 
-	filePath := s.makeFilePath(fileName)
-	fmt.Printf("Saving file as: %s\n", filePath)
+	filePath := s.Paths.DataDir + fileName + ".ics"
 
 	out, err := os.Create(filePath)
 	if err != nil {
@@ -64,21 +68,36 @@ func (s *Service) LoadCalendar(url, fileName, username, password string) error {
 	return nil
 }
 
-func (s *Service) DeleteCalendar(name string) {
-
-	err := os.Remove(s.makeFilePath(name))
+func (s *Service) DeleteCalendar(fileName string) {
+	err := os.Remove(s.Paths.DataDir + fileName)
 	if err != nil {
-		fmt.Println("Ошибка удаления файла:", err)
+		return
+	}
+}
+
+func (s *Service) ClearUnused() {
+	cfg, err := s.Config.Get()
+	if err != nil {
 		return
 	}
 
-	fmt.Println("Файл успешно удален")
-}
-
-func (s *Service) makeFilePath(name string) string {
-	cfg, err := s.Config.Get()
+	icsFiles, err := os.ReadDir(s.Paths.DataDir)
 	if err != nil {
-		return ""
+		log.Fatal(err)
 	}
-	return filepath.Join(cfg.TemporaryFilesPath, name+".ics")
+
+	for _, file := range icsFiles {
+		if file.IsDir() {
+			continue
+		}
+
+		existsInConf := slices.ContainsFunc(cfg.Calendars, func(c domain.Calendar) bool {
+			return c.Name+".ics" == file.Name()
+		})
+
+		if !existsInConf {
+			s.DeleteCalendar(file.Name())
+		}
+	}
+
 }
