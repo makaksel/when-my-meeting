@@ -27,6 +27,7 @@ func New(
 	cfg *config.Service,
 	s *state.Service,
 	strg *storage.Service,
+	p *paths.Paths,
 ) *Service {
 	return &Service{
 		Config:  cfg,
@@ -78,7 +79,7 @@ func (s *Service) parseCalendars(calendars []domain.Calendar) []domain.Meeting {
 	return meetings
 }
 
-func (s *Service) parseICS(path string, calendarID, calendar string) ([]domain.Meeting, error) {
+func (s *Service) parseICS(path string, calendar domain.Calendar) ([]domain.Meeting, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -105,13 +106,13 @@ func (s *Service) parseICS(path string, calendarID, calendar string) ([]domain.M
 	for _, e := range c.Events {
 		if utils.IsToday(e.Start) {
 			meetings = append(meetings, domain.Meeting{
-				CalendarID:  calendarID,
-				Calendar:    calendar,
+				Calendar:    calendar.Name,
 				Title:       e.Summary,
 				Description: e.Description,
 				Start:       e.Start,
 				End:         e.End,
 				Location:    e.Location,
+				Disabled:    !calendar.Enabled,
 			})
 		}
 	}
@@ -119,27 +120,16 @@ func (s *Service) parseICS(path string, calendarID, calendar string) ([]domain.M
 	return meetings, nil
 }
 
-func (s *Service) loadCalendars(calendars []domain.Calendar) {
-	for i, calendar := range calendars {
+func (s *Service) loadCalendars(calendars *[]domain.Calendar) {
+	for i, calendar := range *calendars {
 		err := s.Storage.LoadCalendar(calendar.URL, calendar.Name, calendar.User, calendar.Password)
 		if err != nil {
 			log.Printf("load calendar %s: %v", calendar.Name, err)
-			calendars[i].Error = fmt.Sprintf("load calendar %s: %v", calendar.Name, err)
+			(*calendars)[i].Error = fmt.Sprintf("%v", err)
 			continue
 		}
-		calendars[i].Error = ""
-		calendars[i].LastSync = time.Now().Unix()
+		(*calendars)[i].Error = ""
+		(*calendars)[i].LastSync = time.Now().Unix()
 	}
 
-}
-
-func (s *Service) onlyEnabled(calendars []domain.Calendar) []domain.Calendar {
-	filtered := make([]domain.Calendar, 0, len(calendars))
-	for _, calendar := range calendars {
-		if calendar.Enabled {
-			filtered = append(filtered, calendar)
-		}
-	}
-
-	return filtered
 }
