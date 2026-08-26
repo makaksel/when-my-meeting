@@ -24,7 +24,7 @@ jobs:
         run: |
           fyne package \
             -os darwin \
-            -icon internal/assets/icon.svg \
+            -icon internal/assets/icon.png \
             -name "When My Meeting" \
             -app-id com.makaksel.when-my-meeting \
             -app-version 0.1.0 \
