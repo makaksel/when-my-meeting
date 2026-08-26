@@ -5,6 +5,7 @@ import (
 	"log"
 	"makaksel/when-my-meeting/internal/config"
 	"makaksel/when-my-meeting/internal/domain"
+	"makaksel/when-my-meeting/internal/paths"
 	"makaksel/when-my-meeting/internal/state"
 	"makaksel/when-my-meeting/internal/storage"
 	"makaksel/when-my-meeting/internal/utils"
@@ -19,6 +20,7 @@ type Service struct {
 	Config  *config.Service
 	State   *state.Service
 	Storage *storage.Service
+	Paths   *paths.Paths
 }
 
 func New(
@@ -30,6 +32,7 @@ func New(
 		Config:  cfg,
 		Storage: strg,
 		State:   s,
+		Paths:   p,
 	}
 }
 
@@ -39,7 +42,8 @@ func (s *Service) SyncLocalOnly() error {
 		return err
 	}
 
-	newMeetings := s.parseCalendars(s.onlyEnabled(cfg.Calendars), cfg.TemporaryFilesPath)
+	newMeetings := s.parseCalendars(cfg.Calendars)
+
 	s.State.UpdateMeetings(newMeetings)
 
 	return nil
@@ -51,18 +55,18 @@ func (s *Service) SyncRemote() error {
 		return err
 	}
 
-	s.loadCalendars(s.onlyEnabled(cfg.Calendars))
+	s.loadCalendars(&cfg.Calendars)
 
-	s.Config.Save(cfg)
+	s.Config.Save(cfg) // TODO подумать и вынести в память
 
 	return s.SyncLocalOnly()
 }
 
-func (s *Service) parseCalendars(calendars []domain.Calendar, filesPath string) []domain.Meeting {
+func (s *Service) parseCalendars(calendars []domain.Calendar) []domain.Meeting {
 	meetings := make([]domain.Meeting, 0, 25)
 
 	for _, calendar := range calendars {
-		newMeetings, err := s.parseICS(filesPath+calendar.Name+".ics", calendar.Name, calendar.Name)
+		newMeetings, err := s.parseICS(s.Paths.DataDir+calendar.Name+".ics", calendar)
 		if err != nil {
 			log.Printf("read calendar %s: %v", calendar.Name, err)
 			continue
