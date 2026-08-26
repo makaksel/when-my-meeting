@@ -3,7 +3,7 @@ Name = "When My Meeting"
 ID = "com.makaksel.when-my-meeting"
 Version = "0.1.0"
 Build = 1
-
+Icon = "internal/assets/icon.png"
 
 [Migrations]
 fyneDo = true
