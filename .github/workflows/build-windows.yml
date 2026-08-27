@@ -23,22 +23,11 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-           Write-Host "=== Go ==="
-           go version
-
-           Write-Host "=== Go env ==="
-           go env GOOS GOARCH CGO_ENABLED CC
-
-           Write-Host "=== Creating dist ==="
            New-Item -ItemType Directory -Force -Path dist | Out-Null
-
-           Write-Host "=== Starting build ==="
 
            go build -v `
              -o dist/when-my-meeting.exe `
              ./cmd/when-my-meeting
-
-           Write-Host "=== Build finished ==="
 
       - name: Prepare package
         shell: pwsh
