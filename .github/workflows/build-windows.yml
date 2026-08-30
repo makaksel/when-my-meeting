@@ -23,34 +23,18 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-           New-Item -ItemType Directory -Force -Path dist | Out-Null
-
-           go build -v `
-             -o dist/when-my-meeting.exe `
-             ./cmd/when-my-meeting
-
-      - name: Prepare package
-        shell: pwsh
-        run: |
           New-Item -ItemType Directory -Force -Path dist/package | Out-Null
 
-          Copy-Item `
-            dist/when-my-meeting.exe `
-            dist/package/when-my-meeting.exe
+          go build -v `
+            -o dist/package/when-my-meeting.exe `
+            ./cmd/when-my-meeting
 
           Copy-Item `
             packaging/windows/icon.ico `
             dist/package/icon.ico
 
-      - name: Create ZIP
-        shell: pwsh
-        run: |
-          Compress-Archive `
-            -Path dist/package/* `
-            -DestinationPath dist/when-my-meeting-windows-amd64.zip
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: when-my-meeting-windows-amd64
-          path: dist/when-my-meeting-windows-amd64.zip
+          path: dist/package
