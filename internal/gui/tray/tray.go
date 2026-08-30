@@ -47,13 +47,17 @@ func (s *Service) Run(ctx context.Context) (
 	start func(),
 	end func(),
 ) {
-	go s.listenState(ctx)
 
-	return systray.RunWithExternalLoop(s.onReady, s.onExit)
+
+	return systray.RunWithExternalLoop(func() {
+		s.onReady(ctx)
+	}, s.onExit)
 }
 
-func (s *Service) onReady() {
+func (s *Service) onReady(ctx context.Context) {
 	systray.SetIcon(assets.Icon)
+
+	go s.listenState(ctx)
 
 	s.refreshMenu()
 }
