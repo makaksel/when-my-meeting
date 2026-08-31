@@ -46,13 +46,15 @@ func New(
 func (g *Service) Run(ctx context.Context) {
 
 	startTray, endTray := g.tray.Run(ctx)
-	startTray()
-
 	g.settings.Init()
+
+	startTray()
 
 	go func() {
 		<-ctx.Done()
-		g.app.Quit()
+		fyne.Do(func() {
+			g.app.Quit()
+		})
 	}()
 
 	g.app.Run()

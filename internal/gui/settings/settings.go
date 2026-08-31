@@ -75,7 +75,7 @@ func (s *Service) createWindow() {
 	s.window.SetIcon(
 		fyne.NewStaticResource(
 			"",
-			assets.IconPNG,
+			assets.IconICO,
 		),
 	)
 
