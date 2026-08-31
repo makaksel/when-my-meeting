@@ -44,10 +44,11 @@ func New(
 }
 
 func (g *Service) Run(ctx context.Context) {
-	g.settings.Init()
 
 	startTray, endTray := g.tray.Run(ctx)
 	startTray()
+
+	g.settings.Init()
 
 	go func() {
 		<-ctx.Done()

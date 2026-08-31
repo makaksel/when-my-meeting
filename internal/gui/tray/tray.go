@@ -48,7 +48,6 @@ func (s *Service) Run(ctx context.Context) (
 	end func(),
 ) {
 
-
 	return systray.RunWithExternalLoop(func() {
 		s.onReady(ctx)
 	}, s.onExit)
@@ -57,7 +56,7 @@ func (s *Service) Run(ctx context.Context) (
 func (s *Service) onReady(ctx context.Context) {
 	systray.SetIcon(assets.IconPNG)
 
-	// go s.listenState(ctx)
+	go s.listenState(ctx)
 
 	s.refreshMenu()
 }
