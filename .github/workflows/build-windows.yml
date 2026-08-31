@@ -24,7 +24,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist/package | Out-Null
-
+          # TODO добавить после дебага -ldflags="-H=windowsgui -s -w" `
           go build -v `
             -o dist/package/when-my-meeting.exe `
             ./cmd/when-my-meeting

@@ -3,4 +3,7 @@ package assets
 import _ "embed"
 
 //go:embed icon.png
-var Icon []byte
+var IconPNG []byte
+
+//go:embed icon.ico
+var IconICO []byte
