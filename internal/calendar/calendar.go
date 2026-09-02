@@ -10,6 +10,7 @@ import (
 	"makaksel/when-my-meeting/internal/storage"
 	"makaksel/when-my-meeting/internal/utils"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -67,7 +68,7 @@ func (s *Service) parseCalendars(calendars []domain.Calendar) []domain.Meeting {
 	meetings := make([]domain.Meeting, 0, 25)
 
 	for _, calendar := range calendars {
-		newMeetings, err := s.parseICS(s.Paths.DataDir+calendar.Name+".ics", calendar)
+		newMeetings, err := s.parseICS(filepath.Join(s.Paths.DataDir, calendar.Name+".ics"), calendar)
 		if err != nil {
 			log.Printf("read calendar %s: %v", calendar.Name, err)
 			continue
