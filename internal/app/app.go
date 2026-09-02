@@ -35,7 +35,15 @@ func New(cancel context.CancelFunc) (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("config is not initialized: %s", err)
 	}
+	// Debug
+	cfgD, err := cfg.Get()
+	if err != nil {
+		return nil, fmt.Errorf("config is not initialized: %s", err)
+	}
 
+	fmt.Println("config:", cfgD)
+	fmt.Println("config initialized")
+	// Debug 
 	s := state.New()
 
 	strg := storage.New(cfg, p)
