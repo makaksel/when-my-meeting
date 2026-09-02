@@ -5,7 +5,6 @@ import (
 	"makaksel/when-my-meeting/internal/domain"
 	"makaksel/when-my-meeting/internal/utils"
 
-	"fyne.io/fyne/v2"
 	"fyne.io/systray"
 )
 
@@ -14,9 +13,7 @@ func (s *Service) addBtn(title, tooltip string, callback func()) *systray.MenuIt
 
 	go func() {
 		for range btn.ClickedCh {
-			fyne.Do(func() {
 				callback()
-			})
 		}
 	}()
 

@@ -11,6 +11,7 @@ import (
 	"makaksel/when-my-meeting/internal/config"
 	"makaksel/when-my-meeting/internal/state"
 
+	"fyne.io/fyne/v2"
 	"fyne.io/systray"
 )
 
@@ -100,13 +101,17 @@ func (s *Service) updateMenu() {
 		systray.AddSeparator() // ------------
 	}
 
-	s.addBtn("Обновить 🔄", "Обновить", func() {
-		s.handleSync()
-
+	s.addBtn("Обновить", "Обновить", func() {
+		fyne.Do(func() {
+			s.handleSync()
+		})
 	})
 
 	s.addBtn("Настройки", "Настройки", func() {
-		s.openSettings()
+		fyne.Do(func() {
+			s.openSettings()
+		})
+
 	})
 
 	s.addBtn("Выйти", "Выйти", func() {
