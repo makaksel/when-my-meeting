@@ -59,7 +59,7 @@ func (s *Service) SyncRemote() error {
 
 	s.loadCalendars(&cfg.Calendars)
 
-	s.Config.Save(cfg) // TODO подумать и вынести в память
+	s.Config.Update(cfg)
 
 	return s.SyncLocalOnly()
 }
