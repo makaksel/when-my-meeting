@@ -31,19 +31,11 @@ func New(cancel context.CancelFunc) (*App, error) {
 		return nil, fmt.Errorf("paths is not initialized: %s", err)
 	}
 
-	cfg, err := config.New(p)
-	if err != nil {
-		return nil, fmt.Errorf("config is not initialized: %s", err)
-	}
-	// Debug
-	cfgD, err := cfg.Get()
-	if err != nil {
-		return nil, fmt.Errorf("config is not initialized: %s", err)
+	cfg := config.New(p)
+	if err := cfg.Load(); err != nil {
+		return nil, fmt.Errorf("failed to load config: %s", err)
 	}
 
-	fmt.Println("config:", cfgD)
-	fmt.Println("config initialized")
-	// Debug 
 	s := state.New()
 
 	strg := storage.New(cfg, p)
