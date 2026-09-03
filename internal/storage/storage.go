@@ -53,7 +53,7 @@ func (s *Service) LoadCalendar(url, fileName, username, password string) error {
 		return fmt.Errorf("bad HTTP status: %s", resp.Status)
 	}
 
-	filePath := filepath.Join(s.Paths.DataDir, fileName + ".ics")
+	filePath := filepath.Join(s.Paths.DataDir, fileName+".ics")
 
 	out, err := os.Create(filePath)
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *Service) LoadCalendar(url, fileName, username, password string) error {
 }
 
 func (s *Service) DeleteCalendar(fileName string) {
-	err := os.Remove(filepath.Join(s.Paths.DataDir,  fileName))
+	err := os.Remove(filepath.Join(s.Paths.DataDir, fileName))
 	if err != nil {
 		return
 	}
