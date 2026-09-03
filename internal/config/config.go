@@ -10,42 +10,53 @@ import (
 )
 
 type Service struct {
-	Paths *paths.Paths
+	Paths  *paths.Paths
+	Config *domain.Config
 }
 
-func New(p *paths.Paths) (*Service, error) {
-	s := &Service{
+func New(p *paths.Paths) *Service {
+	return &Service{
 		Paths: p,
 	}
+}
 
+func (s *Service) Get() (*domain.Config, error) {
+	if s.Config == nil {
+		return nil, fmt.Errorf("config is not loaded")
+	}
+	return s.Config, nil
+}
+
+func (s *Service) Load() error {
 	err := os.MkdirAll(s.Paths.ConfigDir, 0755)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create directory: %w", err)
+		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
 	// Если конфиг есть, закгружаем, если нет, создаем базовый
 	if _, err := os.Stat(s.Paths.ConfigPath); os.IsNotExist(err) {
-
 		if err := s.Save(domain.DefaultConfig); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	return s, nil
-}
-
-func (s *Service) Get() (*domain.Config, error) {
 	data, err := os.ReadFile(s.Paths.ConfigPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var cfg domain.Config
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, err
+		return err
 	}
 
-	return &cfg, nil
+	s.Config = &cfg
+
+	return nil
+}
+
+func (s *Service) Update(cfg *domain.Config) {
+	s.Config = cfg
 }
 
 func (s *Service) Save(cfg *domain.Config) error {
@@ -54,5 +65,6 @@ func (s *Service) Save(cfg *domain.Config) error {
 		return err
 	}
 
+	s.Config = cfg
 	return os.WriteFile(s.Paths.ConfigPath, data, 0644)
 }
