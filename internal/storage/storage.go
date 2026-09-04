@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"time"
 )
 
 type Service struct {
@@ -41,7 +42,9 @@ func (s *Service) LoadCalendar(url, fileName, username, password string) error {
 
 	req.SetBasicAuth(username, password)
 
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 15 * time.Second,
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
