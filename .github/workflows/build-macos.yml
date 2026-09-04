@@ -32,10 +32,18 @@ jobs:
             -app-version 0.1.0 \
             -app-build 1
 
+      - name: Debug
+        run: |
+          find . -maxdepth 4 -name "*.app" -o -name "*.zip"
+
       - name: Create ZIP
         run: |
           cd cmd/when-my-meeting
           zip -r "../../when-my-meeting-macos.zip" "When My Meeting.app"
+
+      - name: Inspect ZIP
+        run: |
+          unzip -l when-my-meeting-macos.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
