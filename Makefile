@@ -40,7 +40,7 @@ build-linux: $(ICON_PNG)
 		-o $(BIN) \
 		./cmd/when-my-meeting
 
-deb: build
+deb: build-linux
 	nfpm package \
 		--packager deb \
 		--config packaging/linux/nfpm.yaml \
