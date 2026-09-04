@@ -100,7 +100,7 @@ func (s *Service) updateMenu() {
 		systray.AddSeparator() // ------------
 	}
 
-	s.addBtn("Обновить 🔄", "Обновить", func() {
+	s.addBtn("Обновить", "Обновить", func() {
 		s.handleSync()
 
 	})
