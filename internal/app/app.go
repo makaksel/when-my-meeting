@@ -60,14 +60,14 @@ func New(cancel context.CancelFunc) (*App, error) {
 func (a *App) Run(ctx context.Context) error {
 	a.storage.Init()
 
+	a.gui.Run(ctx)
+
 	a.calendar.SyncLocalOnly()
 	a.calendar.SyncRemote()
 
 	a.notification.Check()
 
 	go a.scheduler.Start(ctx)
-
-	a.gui.Run(ctx)
 
 	return nil
 }
