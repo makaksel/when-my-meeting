@@ -31,9 +31,7 @@ jobs:
             -app-id com.makaksel.when-my-meeting \
             -app-version 0.1.0 \
             -app-build 1
-
           codesign --force --deep --sign - "When My Meeting.app"
-          ditto -c -k --sequesterRsrc "When My Meeting.app" "when-my-meeting-macos.zip"
 
       - name: Upload ZIP
         uses: actions/upload-artifact@v4
