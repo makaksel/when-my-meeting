@@ -52,7 +52,7 @@ jobs:
             "When My Meeting.app"
 
       - name: Upload ZIP
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: when-my-meeting-macos
           path: cmd/when-my-meeting/dist/when-my-meeting-macos.zip
