@@ -31,7 +31,12 @@ jobs:
             -app-id com.makaksel.when-my-meeting \
             -app-version 0.1.0 \
             -app-build 1
-          codesign --force --deep --sign - "When My Meeting.app"
+
+          /usr/libexec/PlistBuddy \
+                -c "Add :LSUIElement bool true" \
+                "When My Meeting.app/Contents/Info.plist"
+
+          codesign --force --sign - "When My Meeting.app"
           mkdir dist
           mv "When My Meeting.app" dist/
 
