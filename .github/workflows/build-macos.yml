@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: when-my-meeting-macos
-          path: when-my-meeting-macos.zip
+          path: ../../When My Meeting.app
