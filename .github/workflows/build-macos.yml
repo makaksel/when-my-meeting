@@ -42,10 +42,14 @@ jobs:
             "When My Meeting.app" \
             "dist/when-my-meeting-macos.zip"
 
-      - name: Check artifact
+      - name: Verify app
         run: |
-          ls -lh cmd/when-my-meeting/dist
-          unzip -l cmd/when-my-meeting/dist/when-my-meeting-macos.zip
+          cd cmd/when-my-meeting
+
+          plutil -p "When My Meeting.app/Contents/Info.plist"
+
+          codesign --verify --deep --strict --verbose=4 \
+            "When My Meeting.app"
 
       - name: Upload ZIP
         uses: actions/upload-artifact@v4
@@ -53,3 +57,4 @@ jobs:
           name: when-my-meeting-macos
           path: cmd/when-my-meeting/dist/when-my-meeting-macos.zip
           if-no-files-found: error
+          archive: false
