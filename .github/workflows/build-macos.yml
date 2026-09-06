@@ -34,10 +34,10 @@ jobs:
 
           codesign --force --deep --sign - "When My Meeting.app"
 
-          zip -r -X "../../when-my-meeting-macos.zip" "When My Meeting.app"
+          # zip -r -X "../../when-my-meeting-macos.zip" "When My Meeting.app"
 
       - name: Upload ZIP
         uses: actions/upload-artifact@v4
         with:
+          name: when-my-meeting-macos
           path: when-my-meeting-macos.zip
-          archive: false
