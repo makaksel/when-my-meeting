@@ -58,16 +58,19 @@ func New(cancel context.CancelFunc) (*App, error) {
 }
 
 func (a *App) Run(ctx context.Context) error {
-	a.storage.Init()
+	err := a.storage.Init()
+	if err != nil {
+		return fmt.Errorf("storage is not initialized: %s", err)
+	}
 
-	a.gui.Run(ctx)
+	go a.calendar.SyncLocalOnly()
+	go a.calendar.SyncRemote()
 
-	a.calendar.SyncLocalOnly()
-	a.calendar.SyncRemote()
-
-	a.notification.Check()
+	go a.notification.Check()
 
 	go a.scheduler.Start(ctx)
+
+	a.gui.Run(ctx)
 
 	return nil
 }

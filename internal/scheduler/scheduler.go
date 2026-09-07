@@ -38,7 +38,6 @@ func (s *Service) Start(ctx context.Context) {
 		log.Printf("scheduler: config is not available: %v", err)
 		return
 	}
-
 	// Воркер для синхронизации календарей
 	if cfg.RefreshInterval != 0 {
 		go s.worker(ctx, time.Duration(cfg.RefreshInterval)*time.Minute, "syncCalendars", func() {
