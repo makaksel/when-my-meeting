@@ -120,6 +120,5 @@ jobs:
       - name: Upload DMG
         uses: actions/upload-artifact@v7
         with:
-          name: when-my-meeting-macos
           path: cmd/when-my-meeting/dist/When My Meeting.dmg
-          archived: false
+          archive: false
