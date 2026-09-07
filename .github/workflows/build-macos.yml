@@ -122,3 +122,4 @@ jobs:
         with:
           name: when-my-meeting-macos
           path: cmd/when-my-meeting/dist/When My Meeting.dmg
+          archived: false
