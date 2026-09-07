@@ -18,11 +18,17 @@ jobs:
           cache: true
 
       - name: Install Fyne CLI
-        run: go install fyne.io/tools/cmd/fyne@latest
-
-      - name: Build
         run: |
+          go install fyne.io/tools/cmd/fyne@latest
+
+      - name: Build app
+        shell: bash
+        run: |
+          set -euo pipefail
+
           cd cmd/when-my-meeting
+
+          rm -rf "When My Meeting.app" dist
 
           fyne package \
             -os darwin \
@@ -32,29 +38,87 @@ jobs:
             -app-version 0.1.0 \
             -app-build 1
 
+          echo "Adding LSUIElement..."
+
           /usr/libexec/PlistBuddy \
             -c "Add :LSUIElement bool true" \
             "When My Meeting.app/Contents/Info.plist"
 
-          codesign --force --sign - "When My Meeting.app"
-          mkdir dist
-          ditto -c -k --sequesterRsrc --keepParent \
-            "When My Meeting.app" \
-            "dist/when-my-meeting-macos.zip"
+          echo "Removing extended attributes..."
 
-      - name: Verify app
-        run: |
-          cd cmd/when-my-meeting
+          xattr -cr "When My Meeting.app"
 
-          plutil -p "When My Meeting.app/Contents/Info.plist"
+          echo "Ad-hoc signing..."
 
-          codesign --verify --deep --strict --verbose=4 \
+          codesign \
+            --force \
+            --sign - \
             "When My Meeting.app"
 
-      - name: Upload ZIP
+          echo "Verifying signature..."
+
+          codesign \
+            --verify \
+            --deep \
+            --strict \
+            --verbose=4 \
+            "When My Meeting.app"
+
+          echo "Checking Info.plist..."
+
+          plutil -p \
+            "When My Meeting.app/Contents/Info.plist"
+
+      - name: Create DMG
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cd cmd/when-my-meeting
+
+          rm -rf dmg dist
+          mkdir -p dmg dist
+
+          # Copy the app into the DMG staging directory.
+          ditto \
+            "When My Meeting.app" \
+            "dmg/When My Meeting.app"
+
+          # Optional: Applications symlink for drag & drop installation.
+          ln -s /Applications dmg/Applications
+
+          # Create compressed DMG.
+          hdiutil create \
+            -volname "When My Meeting" \
+            -srcfolder dmg \
+            -format UDZO \
+            -imagekey zlib-level=9 \
+            -ov \
+            "dist/When My Meeting.dmg"
+
+      - name: Verify artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cd cmd/when-my-meeting
+
+          echo "=== DMG ==="
+          ls -lh dist/
+
+          echo "=== App signature ==="
+          codesign \
+            --verify \
+            --deep \
+            --strict \
+            --verbose=4 \
+            "dmg/When My Meeting.app"
+
+          echo "=== DMG contents ==="
+          hdiutil imageinfo "dist/When My Meeting.dmg" | head -30
+
+      - name: Upload DMG
         uses: actions/upload-artifact@v7
         with:
           name: when-my-meeting-macos
-          path: cmd/when-my-meeting/dist/when-my-meeting-macos.zip
-          if-no-files-found: error
-          archive: false
+          path: cmd/when-my-meeting/dist/When My Meeting.dmg
