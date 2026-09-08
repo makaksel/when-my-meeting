@@ -8,8 +8,7 @@ BIN := $(DIST)/$(APP_NAME)
 
 ICON_SRC := internal/assets/icon.svg
 ICON_PNG := internal/assets/icon.png
-LINUX_ICON := packaging/linux/icon.png
-WINDOWS_ICON := packaging/windows/icon.ico
+WINDOWS_ICON := internal/assets/icon_windows.ico
 
 $(ICON_PNG): $(ICON_SRC)
 	mkdir -p $(dir $@)
@@ -28,6 +27,8 @@ $(WINDOWS_ICON): $(ICON_SRC)
 		$@
 
 .PHONY: build deb clean
+
+icons: $(ICON_PNG) $(WINDOWS_ICON)
 
 run: $(ICON_PNG)
 	go run ./cmd/when-my-meeting/main.go
@@ -48,12 +49,18 @@ deb: build-linux
 
 	rm -rf $(BIN)
 
-
-
 build-windows: $(WINDOWS_ICON)
 	mkdir -p $(DIST)
+	go build -v \
+        -ldflags="-H=windowsgui -s -w" \
+        -o dist/package/when-my-meeting.exe \
+        ./cmd/when-my-meeting
 
-windows-icons: $(WINDOWS_ICON)
+	cp \
+	  internal/assets/icon_windows.ico \
+	  dist/package/icon.ico
+
+
 
 build-macos:
 	mkdir -p $(DIST)
