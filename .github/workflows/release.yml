@@ -130,7 +130,7 @@ jobs:
       - name: Download macOS
         uses: actions/download-artifact@v5
         with:
-          name: macos.dmg
+          name: macos
           path: release
 
       - name: Create Release
