@@ -12,11 +12,16 @@ ICON_SRC := internal/assets/icon.svg
 ICON_PNG := internal/assets/icon.png
 WINDOWS_ICON := internal/assets/icon_windows.ico
 
+LINUX_ASSET := $(DIST)/$(APP_NAME)-linux-amd64-$(VERSION).deb
+WINDOWS_ASSET := $(DIST)/$(APP_NAME)-windows-amd64-$(VERSION).exe
+MACOS_ASSET := $(DIST)/$(APP_NAME)-macos-universal-$(VERSION).dmg
+
 MACOS_DIR := cmd/when-my-meeting
 MACOS_APP := $(MACOS_DIR)/When My Meeting.app
 MACOS_DIST := $(MACOS_DIR)/dist
-MACOS_DMG := $(MACOS_DIST)/macos.dmg
+MACOS_DMG := $(MACOS_DIST)/When My Meeting.dmg
 MACOS_DMG_SRC := $(MACOS_DIR)/dmg
+
 
 .PHONY: \
 	run \
@@ -49,7 +54,7 @@ icons: $(ICON_PNG) $(WINDOWS_ICON)
 
 # Development_____________________
 run: $(ICON_PNG)
-	go run ./cmd/when-my-meeting/main.go
+	go run $(CMD)/main.go
 
 
 # Linux_____________________
@@ -59,35 +64,45 @@ build-linux: $(ICON_PNG)
 	go build \
 		-ldflags="-s -w" \
 		-o $(BIN) \
-		./cmd/when-my-meeting
+		$(CMD)
 
 build-deb: build-linux
 	nfpm package \
 		--packager deb \
 		--config packaging/linux/nfpm.yaml \
-		--target $(DIST)/$(APP_NAME)_$(VERSION)_amd64.deb
+		--target $(LINUX_ASSET)
 
 	rm -f $(BIN)
 
 
 # Windows_____________________
-build-windows: $(WINDOWS_ICON)
+build-windows: $(ICON_PNG)
 	mkdir -p $(DIST)
-	go build -v \
-        -ldflags="-H=windowsgui -s -w" \
-        -o dist/when-my-meeting.exe \
-        ./cmd/when-my-meeting
 
-	cp \
-        $(WINDOWS_ICON) \
-        dist/icon.ico
+	cd "$(CURDIR)" && \
+	fyne package \
+		-os windows \
+		-icon "$(ICON_PNG)" \
+		-name "When My Meeting" \
+		-app-id "$(APP_ID)" \
+		-app-version "$(VERSION)" \
+		-app-build "$(BUILD)"
+
+	mv \
+		"$(CURDIR)/When My Meeting.exe" \
+		"$(WINDOWS_ASSET)"
 
 
 # MacOS_____________________
 build-macos:
-	rm -rf "$(MACOS_APP)" "$(MACOS_DIST)" "$(MACOS_DMG_SRC)"
+	rm -rf \
+		"$(MACOS_APP)" \
+		"$(MACOS_DIST)" \
+		"$(MACOS_DMG_SRC)"
 
-	mkdir -p "$(MACOS_DIST)" "$(MACOS_DMG_SRC)"
+	mkdir -p \
+		"$(MACOS_DIST)" \
+		"$(MACOS_DMG_SRC)"
 
 	cd "$(MACOS_DIR)" && \
 	fyne package \
@@ -97,6 +112,11 @@ build-macos:
 		-app-id "$(APP_ID)" \
 		-app-version "$(VERSION)" \
 		-app-build "$(BUILD)"
+
+	/usr/libexec/PlistBuddy \
+		-c "Delete :LSUIElement" \
+		"$(MACOS_APP)/Contents/Info.plist" \
+		|| true
 
 	/usr/libexec/PlistBuddy \
 		-c "Add :LSUIElement bool true" \
@@ -134,7 +154,13 @@ build-macos:
 		-ov \
 		"$(MACOS_DMG)"
 
-	rm -rf "$(MACOS_DMG_SRC)"
+	mv \
+		"$(MACOS_DMG)" \
+		"$(MACOS_ASSET)"
+
+	rm -rf \
+		"$(MACOS_DMG_SRC)" \
+		"$(MACOS_APP)"
 
 
 # Clean_____________________
