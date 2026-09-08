@@ -33,7 +33,7 @@ icons: $(ICON_PNG) $(WINDOWS_ICON)
 run: $(ICON_PNG)
 	go run ./cmd/when-my-meeting/main.go
 
-build-linux: $(ICON_PNG)
+build-deb: $(ICON_PNG)
 	mkdir -p $(DIST)
 
 	go build \
@@ -41,13 +41,13 @@ build-linux: $(ICON_PNG)
 		-o $(BIN) \
 		./cmd/when-my-meeting
 
-deb: build-linux
 	nfpm package \
 		--packager deb \
 		--config packaging/linux/nfpm.yaml \
 		--target $(DIST)/$(APP_NAME)_$(VERSION)_amd64.deb
 
 	rm -rf $(BIN)
+
 
 build-windows: $(WINDOWS_ICON)
 	mkdir -p $(DIST)
@@ -57,12 +57,72 @@ build-windows: $(WINDOWS_ICON)
         ./cmd/when-my-meeting
 
 	cp \
-	  internal/assets/icon_windows.ico \
+	  $(WINDOWS_ICON) \
 	  dist/icon.ico
 
 
 build-macos:
-	mkdir -p $(DIST)
+	cd cmd/when-my-meeting
+
+	rm -rf "When My Meeting.app" dist
+
+	fyne package \
+	  -os darwin \
+	    -icon $(ICON_PNG) \
+	    -name "When My Meeting" \
+	    -app-id com.makaksel.when-my-meeting \
+	    -app-version $(VERSION) \
+	    -app-build $(BUILD)
+
+	mv "When My Meeting.app" $(DIST)/
+	cd ~/$(DIST)
+	echo "Adding LSUIElement..."
+
+	/usr/libexec/PlistBuddy \
+	  -c "Add :LSUIElement bool true" \
+	    "When My Meeting.app/Contents/Info.plist"
+
+	echo "Removing extended attributes..."
+
+	xattr -cr "When My Meeting.app"
+
+	echo "Ad-hoc signing..."
+
+	codesign \
+	    --force \
+        --sign - \
+        "When My Meeting.app"
+
+	echo "Verifying signature..."
+
+	codesign \
+        --verify \
+        --deep \
+        --strict \
+        --verbose=4 \
+        "When My Meeting.app"
+
+	echo "Checking Info.plist..."
+
+	plutil -p \
+	  "When My Meeting.app/Contents/Info.plist"
+
+	rm -rf dmg dist
+	mkdir -p dmg dist
+
+	ditto \
+	"When My Meeting.app" \
+	"dmg/When My Meeting.app"
+
+	ln -s /Applications dmg/Applications
+
+	hdiutil create \
+	-volname "When My Meeting" \
+	-srcfolder dmg \
+	-format UDZO \
+	-imagekey zlib-level=9 \
+	-ov \
+	"dist/When My Meeting.dmg"
 
 
 clean:
