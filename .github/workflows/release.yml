@@ -103,7 +103,7 @@ jobs:
         with:
           name: macos
           path: cmd/when-my-meeting/dist/macos.dmg
-          archive: false
+          # archive: false
 
   release:
     name: Create Release
@@ -143,5 +143,5 @@ jobs:
           gh release create "$TAG" \
             release/* \
             --repo "${{ github.repository }}" \
-            --title "When My Meeting "$TAG" \
+            --title "When My Meeting ${TAG}" \
             --generate-notes
