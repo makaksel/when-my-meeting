@@ -11,6 +11,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc \
+            libgl1-mesa-dev \
+            xorg-dev \
+            libwayland-dev \
+            libxkbcommon-dev
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
