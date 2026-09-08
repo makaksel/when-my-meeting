@@ -98,10 +98,12 @@ build-macos:
 	rm -rf \
 		"$(MACOS_APP)" \
 		"$(MACOS_DIST)" \
+		"$(MACOS_ASSET)" \
 		"$(MACOS_DMG_SRC)"
 
 	mkdir -p \
 		"$(MACOS_DIST)" \
+		"$(MACOS_ASSET)" \
 		"$(MACOS_DMG_SRC)"
 
 	cd "$(MACOS_DIR)" && \

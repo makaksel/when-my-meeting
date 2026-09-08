@@ -63,6 +63,10 @@ jobs:
           go-version: "1.25.x"
           cache: true
 
+      - name: Install Fyne CLI
+        run: |
+          go install fyne.io/tools/cmd/fyne@latest
+
       - name: Download dependencies
         run: go mod download
 
@@ -103,7 +107,6 @@ jobs:
         with:
           name: macos
           path: cmd/when-my-meeting/dist/macos.dmg
-          # archive: false
 
   release:
     name: Create Release
