@@ -22,7 +22,7 @@ jobs:
           go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
 
       - name: Build app
-        run: make ci-linux
+        run: make build-deb
 
       - name: Upload
         uses: actions/upload-artifact@v7
