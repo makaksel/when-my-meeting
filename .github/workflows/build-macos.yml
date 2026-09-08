@@ -1,4 +1,4 @@
-name: Build macOS
+name: Build MacOS
 
 on:
   workflow_dispatch:
@@ -24,26 +24,6 @@ jobs:
       - name: Build app
         shell: bash
         run: make build-macos
-      # - name: Verify artifacts
-      #   shell: bash
-      #   run: |
-      #     set -euo pipefail
-
-      #     cd cmd/when-my-meeting
-
-      #     echo "=== DMG ==="
-      #     ls -lh dist/
-
-      #     echo "=== App signature ==="
-      #     codesign \
-      #       --verify \
-      #       --deep \
-      #       --strict \
-      #       --verbose=4 \
-      #       "dmg/When My Meeting.app"
-
-      #     echo "=== DMG contents ==="
-      #     hdiutil imageinfo "dist/When My Meeting.dmg" | head -30
 
       - name: Upload DMG
         uses: actions/upload-artifact@v7

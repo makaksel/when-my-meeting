@@ -51,6 +51,7 @@ icons: $(ICON_PNG) $(WINDOWS_ICON)
 run: $(ICON_PNG)
 	go run ./cmd/when-my-meeting/main.go
 
+
 # Linux_____________________
 build-linux: $(ICON_PNG)
 	mkdir -p $(DIST)
@@ -60,7 +61,6 @@ build-linux: $(ICON_PNG)
 		-o $(BIN) \
 		./cmd/when-my-meeting
 
-
 build-deb: build-linux
 	nfpm package \
 		--packager deb \
@@ -68,6 +68,7 @@ build-deb: build-linux
 		--target $(DIST)/$(APP_NAME)_$(VERSION)_amd64.deb
 
 	rm -f $(BIN)
+
 
 # Windows_____________________
 build-windows: $(WINDOWS_ICON)
@@ -80,6 +81,7 @@ build-windows: $(WINDOWS_ICON)
 	cp \
         $(WINDOWS_ICON) \
         dist/icon.ico
+
 
 # MacOS_____________________
 build-macos:
@@ -133,6 +135,7 @@ build-macos:
 		"$(MACOS_DMG)"
 
 	rm -rf "$(MACOS_DMG_SRC)"
+
 
 # Clean_____________________
 clean:
