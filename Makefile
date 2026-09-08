@@ -1,7 +1,7 @@
 APP_NAME := when-my-meeting
 APP_ID := com.makaksel.when-my-meeting
-VERSION := 0.1.0
-BUILD := 1
+VERSION ?= 0.1.0
+BUILD ?= 1
 
 DIST := dist
 BIN := $(DIST)/$(APP_NAME)

@@ -1,0 +1,146 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version"
+        required: true
+        default: "0.1.0"
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc \
+            libgl1-mesa-dev \
+            xorg-dev \
+            libwayland-dev \
+            libxkbcommon-dev
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+          cache: true
+
+      - name: Install nfpm
+        run: |
+          go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+
+      - name: Build app
+        run: make build-deb VERSION="${{ inputs.version }}"
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: when-my-meeting-linux-amd64
+          path: dist/*.deb
+
+  windows:
+    name: Build Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Build
+        shell: pwsh
+        run: make build-windows VERSION="${{ inputs.version }}"
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: when-my-meeting-windows-amd64
+          path: dist/
+
+  macos:
+    name: Build macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+          cache: true
+
+      - name: Install Fyne CLI
+        run: |
+          go install fyne.io/tools/cmd/fyne@latest
+
+      - name: Build app
+        shell: bash
+        run: make build-macos VERSION="${{ inputs.version }}"
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v7
+        with:
+          path: cmd/when-my-meeting/dist/When My Meeting.dmg
+          archive: false
+
+  release:
+    name: Create Release
+    needs:
+      - linux
+      - windows
+      - macos
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Linux
+        uses: actions/download-artifact@v5
+        with:
+          name: linux
+          path: release
+
+      - name: Download Windows
+        uses: actions/download-artifact@v5
+        with:
+          name: windows
+          path: release
+
+      - name: Download macOS
+        uses: actions/download-artifact@v5
+        with:
+          name: macos
+          path: release
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ inputs.version }}"
+          TAG="v${VERSION}"
+
+          gh release create "$TAG" \
+            release/* \
+            --repo "${{ github.repository }}" \
+            --title "When My Meeting "$TAG" \
+            --generate-notes
