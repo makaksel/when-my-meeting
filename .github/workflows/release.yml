@@ -143,5 +143,5 @@ jobs:
           gh release create "$TAG" \
             release/* \
             --repo "${{ github.repository }}" \
-            --title "When My Meeting ${TAG}" \
+            --title "${TAG} When My Meeting" \
             --generate-notes
