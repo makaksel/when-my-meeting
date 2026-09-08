@@ -53,13 +53,12 @@ build-windows: $(WINDOWS_ICON)
 	mkdir -p $(DIST)
 	go build -v \
         -ldflags="-H=windowsgui -s -w" \
-        -o dist/package/when-my-meeting.exe \
+        -o dist/when-my-meeting.exe \
         ./cmd/when-my-meeting
 
 	cp \
 	  internal/assets/icon_windows.ico \
-	  dist/package/icon.ico
-
+	  dist/icon.ico
 
 
 build-macos:

@@ -22,18 +22,7 @@ jobs:
 
       - name: Build
         shell: pwsh
-        run: |
-          make build-windows
-          # New-Item -ItemType Directory -Force -Path dist/package | Out-Null
-
-          # go build -v `
-          #   -ldflags="-H=windowsgui -s -w" `
-          #   -o dist/package/when-my-meeting.exe `
-          #   ./cmd/when-my-meeting
-
-          # Copy-Item `
-          #   internal/assets/icon_windows.ico `
-          #   dist/package/icon.ico
+        run: make build-windows
 
       - name: Upload
         uses: actions/upload-artifact@v7
