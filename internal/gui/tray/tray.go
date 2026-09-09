@@ -54,7 +54,7 @@ func (s *Service) Run(ctx context.Context) (
 }
 
 func (s *Service) onReady(ctx context.Context) {
-	systray.SetIcon(assets.TrayIcon)
+	systray.SetIcon(assets.IconPNG)
 
 	go s.listenState(ctx)
 

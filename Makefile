@@ -8,9 +8,7 @@ BIN := $(DIST)/$(APP_NAME)
 
 CMD := ./cmd/when-my-meeting
 
-ICON_SRC := internal/assets/icon.svg
 ICON_PNG := internal/assets/icon.png
-WINDOWS_ICON := internal/assets/icon_windows.ico # TODO удалить после проверки
 
 LINUX_ASSET := $(DIST)/$(APP_NAME)-linux-amd64-$(VERSION).deb
 WINDOWS_ASSET := $(DIST)/$(APP_NAME)-windows-amd64-$(VERSION).exe
@@ -32,26 +30,6 @@ MACOS_ASSET := $(DIST)/$(APP_NAME)-macos-universal-$(VERSION).dmg
 	build-macos \
 	build-deb \
 	clean
-
-
-# Assets_____________________
-$(ICON_PNG): $(ICON_SRC)
-	mkdir -p $(dir $@)
-	magick \
-		-background none \
-		$< \
-		-resize 256x256 \
-		$@
-
-$(WINDOWS_ICON): $(ICON_SRC)
-	mkdir -p $(dir $@)
-	magick \
-		-background none \
-		$< \
-		-define icon:auto-resize=16,32,48,64,128,256 \
-		$@
-
-icons: $(ICON_PNG) $(WINDOWS_ICON)
 
 # Development_____________________
 run: $(ICON_PNG)

@@ -28,7 +28,6 @@ Available packages:
 
 - Go 1.25+
 - Fyne
-- ImageMagick
 - nfpm (for Linux packages)
 
 ### Run locally
@@ -87,7 +86,6 @@ Build artifacts are placed in dist/.
 
 - Go 1.25+
 - Fyne
-- ImageMagick
 - nfpm (для пакетов Linux)
 
 ### Запуск локально
@@ -118,4 +116,4 @@ make build-macos VERSION=0.1.0
 
 ### License
 
-MIT
+[MIT](/?tab=MIT-1-ov-file)
