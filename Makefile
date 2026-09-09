@@ -82,7 +82,7 @@ build-windows: $(ICON_PNG)
 	cd "$(CMD)" && \
 	fyne package \
 		-os windows \
-		-icon "$(ICON_PNG)" \
+		-icon "../../$(ICON_PNG)" \
 		-name "When My Meeting" \
 		-app-id "$(APP_ID)" \
 		-app-version "$(VERSION)" \
