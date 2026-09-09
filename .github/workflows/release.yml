@@ -118,6 +118,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Show release files
+        run: |
+          find release -maxdepth 2 -type f -print
+
       - name: Download Linux
         uses: actions/download-artifact@v8
         with:

@@ -10,7 +10,7 @@ CMD := ./cmd/when-my-meeting
 
 ICON_SRC := internal/assets/icon.svg
 ICON_PNG := internal/assets/icon.png
-WINDOWS_ICON := internal/assets/icon_windows.ico
+WINDOWS_ICON := internal/assets/icon_windows.ico # TODO удалить после проверки
 
 LINUX_ASSET := $(DIST)/$(APP_NAME)-linux-amd64-$(VERSION).deb
 WINDOWS_ASSET := $(DIST)/$(APP_NAME)-windows-amd64-$(VERSION).exe
@@ -19,8 +19,9 @@ MACOS_ASSET := $(DIST)/$(APP_NAME)-macos-universal-$(VERSION).dmg
 MACOS_DIR := cmd/when-my-meeting
 MACOS_APP := $(MACOS_DIR)/When My Meeting.app
 MACOS_DIST := $(MACOS_DIR)/dist
-MACOS_DMG := $(MACOS_DIST)/macos.dmg
 MACOS_DMG_SRC := $(MACOS_DIR)/dmg
+MACOS_FYNE_DMG := $(MACOS_DIR)/When My Meeting.dmg
+MACOS_ASSET := $(DIST)/$(APP_NAME)-macos-universal-$(VERSION).dmg
 
 
 .PHONY: \
@@ -98,13 +99,13 @@ build-macos:
 	rm -rf \
 		"$(MACOS_APP)" \
 		"$(MACOS_DIST)" \
-		"$(MACOS_ASSET)" \
-		"$(MACOS_DMG_SRC)"
+		"$(MACOS_DMG_SRC)" \
+		"$(MACOS_FYNE_DMG)"
 
 	mkdir -p \
 		"$(MACOS_DIST)" \
-		"$(MACOS_ASSET)" \
-		"$(MACOS_DMG_SRC)"
+		"$(MACOS_DMG_SRC)" \
+		"$(DIST)"
 
 	cd "$(MACOS_DIR)" && \
 	fyne package \
@@ -154,10 +155,10 @@ build-macos:
 		-format UDZO \
 		-imagekey zlib-level=9 \
 		-ov \
-		"$(MACOS_DMG)"
+		"$(MACOS_FYNE_DMG)"
 
 	mv \
-		"$(MACOS_DMG)" \
+		"$(MACOS_FYNE_DMG)" \
 		"$(MACOS_ASSET)"
 
 	rm -rf \
