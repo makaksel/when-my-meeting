@@ -19,7 +19,7 @@ MACOS_ASSET := $(DIST)/$(APP_NAME)-macos-universal-$(VERSION).dmg
 MACOS_DIR := cmd/when-my-meeting
 MACOS_APP := $(MACOS_DIR)/When My Meeting.app
 MACOS_DIST := $(MACOS_DIR)/dist
-MACOS_DMG := $(MACOS_DIST)/When My Meeting.dmg
+MACOS_DMG := $(MACOS_DIST)/macos.dmg
 MACOS_DMG_SRC := $(MACOS_DIR)/dmg
 
 
