@@ -79,7 +79,7 @@ build-deb: build-linux
 build-windows: $(ICON_PNG)
 	mkdir -p $(DIST)
 
-	cd "$(CURDIR)" && \
+	cd "$(CMD)" && \
 	fyne package \
 		-os windows \
 		-icon "$(ICON_PNG)" \
@@ -89,7 +89,7 @@ build-windows: $(ICON_PNG)
 		-app-build "$(BUILD)"
 
 	mv \
-		"$(CURDIR)/When My Meeting.exe" \
+		"$(CMD)/When My Meeting.exe" \
 		"$(WINDOWS_ASSET)"
 
 
