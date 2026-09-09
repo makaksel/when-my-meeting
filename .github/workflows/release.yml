@@ -102,6 +102,12 @@ jobs:
         shell: bash
         run: make build-macos VERSION="${{ inputs.version }}"
 
+      - name: Show macOS build files
+        shell: bash
+        run: |
+          echo "dist:"
+          find dist -maxdepth 2 -type f -print
+
       - name: Upload DMG
         uses: actions/upload-artifact@v7
         with:
@@ -118,10 +124,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Show release files
-        run: |
-          find release -maxdepth 2 -type f -print
-
       - name: Download Linux
         uses: actions/download-artifact@v8
         with:
@@ -139,6 +141,10 @@ jobs:
         with:
           name: macos
           path: release
+
+      - name: Show release files
+        run: |
+          find release -maxdepth 2 -type f -print
 
       - name: Create Release
         env:
