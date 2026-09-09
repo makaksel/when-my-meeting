@@ -111,9 +111,3 @@ make build-macos VERSION=0.1.0
 ```
 
 Артефакты сборки размещаются в папке `dist/`.
-
----
-
-### License
-
-[MIT](?tab=MIT-1-ov-file)
