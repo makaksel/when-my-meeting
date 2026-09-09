@@ -14,7 +14,7 @@ A small cross-platform desktop app that shows your upcoming meetings and helps y
 
 ## Downloads
 
-Get the latest version from the [Releases](https://github.com/makaksel/when-my-meeting/releases) page.
+Get the latest version from the [releases](https://github.com/makaksel/when-my-meeting/releases) page.
 
 Available packages:
 
