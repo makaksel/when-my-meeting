@@ -44,7 +44,7 @@ jobs:
         run: make build-deb VERSION="${{ inputs.version }}"
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux
           path: dist/*.deb
@@ -75,7 +75,7 @@ jobs:
         run: make build-windows VERSION="${{ inputs.version }}"
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows
           path: dist/
@@ -103,9 +103,9 @@ jobs:
         run: make build-macos VERSION="${{ inputs.version }}"
 
       - name: Upload DMG
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: macos
+          archive: false
           path: dist/when-my-meeting-macos-universal-${{ inputs.version }}.dmg
 
   release:
@@ -119,21 +119,21 @@ jobs:
 
     steps:
       - name: Download Linux
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: linux
           path: release
 
       - name: Download Windows
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: windows
           path: release
 
       - name: Download macOS
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
-          name: macos
+          name: when-my-meeting-macos-universal-${{ inputs.version }}.dmg
           path: release
 
       - name: Create Release
