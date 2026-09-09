@@ -116,4 +116,4 @@ make build-macos VERSION=0.1.0
 
 ### License
 
-[MIT](https://github.com/makaksel/when-my-meeting?tab=MIT-1-ov-file)
+[MIT](?tab=MIT-1-ov-file)
