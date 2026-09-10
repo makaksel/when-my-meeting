@@ -1,6 +1,6 @@
 # When My Meeting
 
-A small cross-platform desktop app that shows your upcoming meetings and helps you keep track of your schedule.
+A cross-platform desktop app that shows your upcoming meetings and helps you keep track of your schedule.
 
 ## Features
 
