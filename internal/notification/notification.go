@@ -44,7 +44,7 @@ func (s *Service) Check() {
 		return
 	}
 
-	m := s.State.GetFolowingMeetings()
+	m := s.State.GetFollowingMeetings()
 	for _, meeting := range m {
 		if meeting.Start.Local().Before(time.Now().Add(time.Duration(cfg.Notifications.Before) * time.Minute)) {
 			if s.cache[makeKey(&meeting)] {
@@ -58,7 +58,7 @@ func (s *Service) Check() {
 }
 
 func (s *Service) ClearCache() {
-	meetings := s.State.GetFolowingMeetings()
+	meetings := s.State.GetFollowingMeetings()
 
 	for k := range s.cache {
 		exists := false
@@ -81,7 +81,7 @@ func makeKey(m *domain.Meeting) string {
 
 func (s *Service) sendNotification(m *domain.Meeting) {
 	title := fmt.Sprintf("%s-%s %s", m.Start.Local().Format("15:04"), m.End.Local().Format("15:04"), m.Title)
-	location := fmt.Sprintf("Место провердения: %s\n\n", m.Location)
+	location := fmt.Sprintf("Место проведения: %s\n\n", m.Location)
 
 	err := beeep.Notify(title, "\n"+location+m.Description, assets.IconPNG)
 	if err != nil {

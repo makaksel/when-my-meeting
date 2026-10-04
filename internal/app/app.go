@@ -38,18 +38,18 @@ func New(cancel context.CancelFunc) (*App, error) {
 
 	s := state.New()
 
-	strg := storage.New(cfg, p)
+	stg := storage.New(cfg, p)
 
 	n := notification.New(cfg, s)
 
-	c := calendar.New(cfg, s, strg, p)
+	c := calendar.New(cfg, s, stg, p)
 
 	sch := scheduler.New(cfg, s, c, n)
 
-	gui := gui.New(cfg, s, cancel, c.SyncRemote, strg.DeleteCalendar)
+	gui := gui.New(cfg, s, cancel, c.SyncRemote, stg.DeleteCalendar)
 
 	return &App{
-		storage:      strg,
+		storage:      stg,
 		calendar:     c,
 		notification: n,
 		scheduler:    sch,

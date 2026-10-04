@@ -13,31 +13,31 @@ func (s *Service) GetMeetings() []domain.Meeting {
 	return s.State.Meetings
 }
 
-func (s *Service) GetFolowingMeetings() []domain.Meeting {
+func (s *Service) GetFollowingMeetings() []domain.Meeting {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	meetings := s.State.Meetings
 
-	folowing := make([]domain.Meeting, 0, len(meetings))
+	following := make([]domain.Meeting, 0, len(meetings))
 
 	for i := range meetings {
-		if utils.IsFolowing(meetings[i].End) && !meetings[i].Disabled {
-			folowing = append(folowing, meetings[i])
+		if utils.IsFollowing(meetings[i].End) && !meetings[i].Disabled {
+			following = append(following, meetings[i])
 		}
 	}
 
-	if len(folowing) == 0 {
+	if len(following) == 0 {
 		return nil
 	}
-	return folowing
+	return following
 }
 
 func (s *Service) GetNextMeeting() *domain.Meeting {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	m := s.GetFolowingMeetings()
+	m := s.GetFollowingMeetings()
 
 	if len(m) == 0 {
 		return &domain.Meeting{}

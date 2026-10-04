@@ -92,7 +92,7 @@ func (s *Service) updateMenu() {
 		systray.AddSeparator() // ------------
 	}
 
-	meetings := s.State.GetFolowingMeetings()
+	meetings := s.State.GetFollowingMeetings()
 	if len(meetings) > 1 {
 		for _, m := range meetings[1:] {
 			s.addMeetingItem(&m)

@@ -13,7 +13,7 @@ func IsToday(target *time.Time) bool {
 	return target.Format(time.DateOnly) == time.Now().Format(time.DateOnly)
 }
 
-func IsFolowing(target *time.Time) bool {
+func IsFollowing(target *time.Time) bool {
 	return IsToday(target) && target.After(time.Now().Local())
 }
 
