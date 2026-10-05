@@ -46,12 +46,6 @@ make build-windows
 make build-macos
 ```
 
-Specify a version:
-
-```bash
-make build-macos VERSION=0.1.0
-```
-
 Build artifacts are placed in dist/.
 
 ---
@@ -102,12 +96,6 @@ make run
 make build-deb
 make build-windows
 make build-macos
-```
-
-Указание версии:
-
-```bash
-make build-macos VERSION=0.1.0
 ```
 
 Артефакты сборки размещаются в папке `dist/`.
